@@ -56,7 +56,7 @@ func (m App) logsFiltered() []string {
 		return m.logs.lines
 	}
 	q := strings.ToLower(m.logs.searchQuery)
-	var out []string
+	out := make([]string, 0, len(m.logs.lines))
 	for _, line := range m.logs.lines {
 		if strings.Contains(strings.ToLower(line), q) {
 			out = append(out, line)
@@ -125,8 +125,7 @@ func (m App) handleLogsSearchKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m = m.confirmLogsSearch()
 	case tea.KeyBackspace:
 		if len(m.logs.searchQuery) > 0 {
-			runes := []rune(m.logs.searchQuery)
-			m.logs.searchQuery = string(runes[:len(runes)-1])
+			m.logs.searchQuery = trimLastRune(m.logs.searchQuery)
 		}
 		m.logs.scroll = scrollState{}
 	case tea.KeyUp, tea.KeyDown, tea.KeyHome, tea.KeyEnd:

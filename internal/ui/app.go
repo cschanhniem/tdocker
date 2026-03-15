@@ -5,11 +5,17 @@ import (
 	"slices"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"charm.land/bubbles/v2/table"
 	tea "charm.land/bubbletea/v2"
 	"github.com/pivovarit/tdocker/internal/docker"
 )
+
+func trimLastRune(s string) string {
+	_, size := utf8.DecodeLastRuneInString(s)
+	return s[:len(s)-size]
+}
 
 const (
 	statsRows        = 5
@@ -159,7 +165,7 @@ func matchesFilter(c docker.Container, q string) bool {
 func (m App) filtered() []docker.Container {
 	if m.filterQuery != "" {
 		q := strings.ToLower(m.filterQuery)
-		var out []docker.Container
+		out := make([]docker.Container, 0, len(m.sorted))
 		for _, c := range m.sorted {
 			if matchesFilter(c, q) {
 				out = append(out, c)
@@ -172,7 +178,7 @@ func (m App) filtered() []docker.Container {
 		return m.sorted
 	}
 	if len(m.collapsedProjects) == 0 {
-		var out []docker.Container
+		out := make([]docker.Container, 0, len(m.sorted)+len(m.expandedContainers)*4)
 		for _, c := range m.sorted {
 			out = append(out, c)
 			if data, expanded := m.expandedContainers[c.ID]; expanded {
@@ -182,31 +188,35 @@ func (m App) filtered() []docker.Container {
 		return out
 	}
 
-	collapsedGroups := map[string][]docker.Container{}
-	emitted := map[string]bool{}
-	var out []docker.Container
+	out := make([]docker.Container, 0, len(m.sorted))
+	var pendingProj string
+	var pendingGroup []docker.Container
 
-	for _, c := range m.sorted {
-		proj := c.ComposeProject()
-		if proj != "" && m.collapsedProjects[proj] {
-			collapsedGroups[proj] = append(collapsedGroups[proj], c)
+	flush := func() {
+		if pendingProj != "" {
+			out = append(out, collapseSummary(pendingProj, pendingGroup))
+			pendingProj = ""
+			pendingGroup = pendingGroup[:0]
 		}
 	}
 
 	for _, c := range m.sorted {
 		proj := c.ComposeProject()
 		if proj != "" && m.collapsedProjects[proj] {
-			if !emitted[proj] {
-				emitted[proj] = true
-				out = append(out, collapseSummary(proj, collapsedGroups[proj]))
+			if proj != pendingProj {
+				flush()
+				pendingProj = proj
 			}
+			pendingGroup = append(pendingGroup, c)
 		} else {
+			flush()
 			out = append(out, c)
 			if data, expanded := m.expandedContainers[c.ID]; expanded {
 				out = append(out, detailRows(data)...)
 			}
 		}
 	}
+	flush()
 
 	return out
 }
@@ -223,7 +233,10 @@ func (m App) currentSelectedID() string {
 }
 
 func (m App) selectedContainer() (docker.Container, bool) {
-	filtered := m.filtered()
+	return m.selectedContainerFrom(m.filtered())
+}
+
+func (m App) selectedContainerFrom(filtered []docker.Container) (docker.Container, bool) {
 	if c := m.table.Cursor(); c >= 0 && c < len(filtered) {
 		return filtered[c], true
 	}
