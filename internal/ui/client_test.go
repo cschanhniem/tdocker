@@ -19,7 +19,7 @@ func modelWithMock(mc *stubClient, containers []docker.Container) App {
 
 func TestClient_RKey_FetchesWithCurrentShowAll(t *testing.T) {
 	for _, showAll := range []bool{true, false} {
-		mc := newStubClient()
+		mc := &stubClient{}
 		var gotAll bool
 		mc.fetchContainers = func(all bool) tea.Cmd {
 			gotAll = all
@@ -35,7 +35,7 @@ func TestClient_RKey_FetchesWithCurrentShowAll(t *testing.T) {
 }
 
 func TestClient_AKey_TogglesShowAllBeforeFetch(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotAll bool
 	mc.fetchContainers = func(all bool) tea.Cmd {
 		gotAll = all
@@ -50,7 +50,7 @@ func TestClient_AKey_TogglesShowAllBeforeFetch(t *testing.T) {
 }
 
 func TestClient_ConfirmStop_CallsStopContainerWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.stopContainer = func(id string) tea.Cmd {
 		gotID = id
@@ -65,7 +65,7 @@ func TestClient_ConfirmStop_CallsStopContainerWithID(t *testing.T) {
 }
 
 func TestClient_ConfirmStart_CallsStartContainerWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.startContainer = func(id string) tea.Cmd {
 		gotID = id
@@ -80,7 +80,7 @@ func TestClient_ConfirmStart_CallsStartContainerWithID(t *testing.T) {
 }
 
 func TestClient_ConfirmDelete_CallsDeleteContainerWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.deleteContainer = func(id string) tea.Cmd {
 		gotID = id
@@ -95,7 +95,7 @@ func TestClient_ConfirmDelete_CallsDeleteContainerWithID(t *testing.T) {
 }
 
 func TestClient_TKey_CallsFetchStatsWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.fetchStats = func(id string) tea.Cmd {
 		gotID = id
@@ -109,7 +109,7 @@ func TestClient_TKey_CallsFetchStatsWithID(t *testing.T) {
 }
 
 func TestClient_LKey_CallsStartLogsWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.startLogs = func(_ context.Context, id string, _ string, _ bool, _ string, _ int) tea.Cmd {
 		gotID = id
@@ -123,7 +123,7 @@ func TestClient_LKey_CallsStartLogsWithID(t *testing.T) {
 }
 
 func TestClient_IKey_CallsInspectContainerWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.inspectContainer = func(id string) tea.Cmd {
 		gotID = id
@@ -137,7 +137,7 @@ func TestClient_IKey_CallsInspectContainerWithID(t *testing.T) {
 }
 
 func TestClient_EKey_CallsCheckShellAvailableWithID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.checkShellAvail = func(id string) tea.Cmd {
 		gotID = id
@@ -151,7 +151,7 @@ func TestClient_EKey_CallsCheckShellAvailableWithID(t *testing.T) {
 }
 
 func TestClient_ShellAvailableMsg_CallsExecContainer(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID, gotShell string
 	mc.execContainer = func(id, shell string) tea.Cmd {
 		gotID = id
@@ -169,7 +169,7 @@ func TestClient_ShellAvailableMsg_CallsExecContainer(t *testing.T) {
 }
 
 func TestClient_StopMsg_FetchesContainers(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		fetched = true
@@ -184,7 +184,7 @@ func TestClient_StopMsg_FetchesContainers(t *testing.T) {
 }
 
 func TestClient_StartMsg_FetchesContainers(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		fetched = true
@@ -199,7 +199,7 @@ func TestClient_StartMsg_FetchesContainers(t *testing.T) {
 }
 
 func TestClient_ExecDoneMsg_FetchesContainers(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		fetched = true
@@ -213,7 +213,7 @@ func TestClient_ExecDoneMsg_FetchesContainers(t *testing.T) {
 }
 
 func TestClient_ShellUnavailableMsg_SetsError(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	m := modelWithMock(mc, nil)
 	got := update(m, docker.ShellAvailableMsg{ID: runningContainer.ID, Available: false})
 	if got.err == nil {

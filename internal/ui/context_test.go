@@ -14,7 +14,7 @@ var testContexts = []docker.Context{
 }
 
 func TestContextPicker_XKey_CallsFetchContexts(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContexts = func() tea.Cmd {
 		fetched = true
@@ -129,7 +129,7 @@ func TestContextPicker_CursorDoesNotOverflow(t *testing.T) {
 }
 
 func TestContextPicker_Enter_CallsSwitchContext(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotName string
 	mc.switchContext = func(name string) tea.Cmd {
 		gotName = name
@@ -146,7 +146,7 @@ func TestContextPicker_Enter_CallsSwitchContext(t *testing.T) {
 }
 
 func TestContextPicker_SwitchMsg_ClosesAndRefreshes(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		return func() tea.Msg { return nil }
 	}

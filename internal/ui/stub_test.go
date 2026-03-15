@@ -6,6 +6,8 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
+var noopCmd tea.Cmd = func() tea.Msg { return nil }
+
 type stubClient struct {
 	fetchContainers        func(bool) tea.Cmd
 	stopContainer          func(string) tea.Cmd
@@ -32,62 +34,141 @@ type stubClient struct {
 	restartCompose         func(string) tea.Cmd
 }
 
-func newStubClient() *stubClient {
-	noop := func() tea.Msg { return nil }
-	noopStr := func(_ string) tea.Cmd { return noop }
-	return &stubClient{
-		fetchContainers:        func(_ bool) tea.Cmd { return noop },
-		stopContainer:          noopStr,
-		startContainer:         noopStr,
-		restartContainer:       noopStr,
-		deleteContainer:        noopStr,
-		checkShellAvail:        noopStr,
-		execContainer:          func(_ string, _ string) tea.Cmd { return noop },
-		checkDebugAvail:        noopStr,
-		debugContainer:         noopStr,
-		inspectContainer:       noopStr,
-		inspectContainerExpand: noopStr,
-		fetchStats:             noopStr,
-		startLogs:              func(_ context.Context, _ string, _ string, _ bool, _ string, _ int) tea.Cmd { return noop },
-		supportsGrep:           func() tea.Cmd { return noop },
-		startEvents:            func(_ context.Context, _ int) tea.Cmd { return noop },
-		fetchContexts:          func() tea.Cmd { return noop },
-		switchContext:          noopStr,
-		pauseContainer:         noopStr,
-		unpauseContainer:       noopStr,
-		renameContainer:        func(_ string, _ string) tea.Cmd { return noop },
-		stopCompose:            noopStr,
-		startCompose:           noopStr,
-		restartCompose:         noopStr,
+func (c *stubClient) FetchContainers(all bool) tea.Cmd {
+	if c.fetchContainers != nil {
+		return c.fetchContainers(all)
 	}
+	return noopCmd
 }
-
-func (c *stubClient) FetchContainers(all bool) tea.Cmd         { return c.fetchContainers(all) }
-func (c *stubClient) StopContainer(id string) tea.Cmd          { return c.stopContainer(id) }
-func (c *stubClient) StartContainer(id string) tea.Cmd         { return c.startContainer(id) }
-func (c *stubClient) RestartContainer(id string) tea.Cmd       { return c.restartContainer(id) }
-func (c *stubClient) DeleteContainer(id string) tea.Cmd        { return c.deleteContainer(id) }
-func (c *stubClient) CheckShellAvailable(id string) tea.Cmd    { return c.checkShellAvail(id) }
-func (c *stubClient) ExecContainer(id, shell string) tea.Cmd   { return c.execContainer(id, shell) }
-func (c *stubClient) CheckDebugAvailable(id string) tea.Cmd    { return c.checkDebugAvail(id) }
-func (c *stubClient) DebugContainer(id string) tea.Cmd         { return c.debugContainer(id) }
-func (c *stubClient) InspectContainer(id string) tea.Cmd       { return c.inspectContainer(id) }
-func (c *stubClient) InspectContainerExpand(id string) tea.Cmd { return c.inspectContainerExpand(id) }
-func (c *stubClient) FetchStats(id string) tea.Cmd             { return c.fetchStats(id) }
+func (c *stubClient) StopContainer(id string) tea.Cmd {
+	if c.stopContainer != nil {
+		return c.stopContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) StartContainer(id string) tea.Cmd {
+	if c.startContainer != nil {
+		return c.startContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) RestartContainer(id string) tea.Cmd {
+	if c.restartContainer != nil {
+		return c.restartContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) DeleteContainer(id string) tea.Cmd {
+	if c.deleteContainer != nil {
+		return c.deleteContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) CheckShellAvailable(id string) tea.Cmd {
+	if c.checkShellAvail != nil {
+		return c.checkShellAvail(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) ExecContainer(id, shell string) tea.Cmd {
+	if c.execContainer != nil {
+		return c.execContainer(id, shell)
+	}
+	return noopCmd
+}
+func (c *stubClient) CheckDebugAvailable(id string) tea.Cmd {
+	if c.checkDebugAvail != nil {
+		return c.checkDebugAvail(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) DebugContainer(id string) tea.Cmd {
+	if c.debugContainer != nil {
+		return c.debugContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) InspectContainer(id string) tea.Cmd {
+	if c.inspectContainer != nil {
+		return c.inspectContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) InspectContainerExpand(id string) tea.Cmd {
+	if c.inspectContainerExpand != nil {
+		return c.inspectContainerExpand(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) FetchStats(id string) tea.Cmd {
+	if c.fetchStats != nil {
+		return c.fetchStats(id)
+	}
+	return noopCmd
+}
 func (c *stubClient) StartLogs(ctx context.Context, id string, tail string, timestamps bool, grep string, gen int) tea.Cmd {
-	return c.startLogs(ctx, id, tail, timestamps, grep, gen)
+	if c.startLogs != nil {
+		return c.startLogs(ctx, id, tail, timestamps, grep, gen)
+	}
+	return noopCmd
 }
-func (c *stubClient) SupportsGrep() tea.Cmd { return c.supportsGrep() }
+func (c *stubClient) SupportsGrep() tea.Cmd {
+	if c.supportsGrep != nil {
+		return c.supportsGrep()
+	}
+	return noopCmd
+}
 func (c *stubClient) StartEvents(ctx context.Context, gen int) tea.Cmd {
-	return c.startEvents(ctx, gen)
+	if c.startEvents != nil {
+		return c.startEvents(ctx, gen)
+	}
+	return noopCmd
 }
-func (c *stubClient) FetchContexts() tea.Cmd             { return c.fetchContexts() }
-func (c *stubClient) SwitchContext(name string) tea.Cmd  { return c.switchContext(name) }
-func (c *stubClient) PauseContainer(id string) tea.Cmd   { return c.pauseContainer(id) }
-func (c *stubClient) UnpauseContainer(id string) tea.Cmd { return c.unpauseContainer(id) }
+func (c *stubClient) FetchContexts() tea.Cmd {
+	if c.fetchContexts != nil {
+		return c.fetchContexts()
+	}
+	return noopCmd
+}
+func (c *stubClient) SwitchContext(name string) tea.Cmd {
+	if c.switchContext != nil {
+		return c.switchContext(name)
+	}
+	return noopCmd
+}
+func (c *stubClient) PauseContainer(id string) tea.Cmd {
+	if c.pauseContainer != nil {
+		return c.pauseContainer(id)
+	}
+	return noopCmd
+}
+func (c *stubClient) UnpauseContainer(id string) tea.Cmd {
+	if c.unpauseContainer != nil {
+		return c.unpauseContainer(id)
+	}
+	return noopCmd
+}
 func (c *stubClient) RenameContainer(id, newName string) tea.Cmd {
-	return c.renameContainer(id, newName)
+	if c.renameContainer != nil {
+		return c.renameContainer(id, newName)
+	}
+	return noopCmd
 }
-func (c *stubClient) StopCompose(project string) tea.Cmd    { return c.stopCompose(project) }
-func (c *stubClient) StartCompose(project string) tea.Cmd   { return c.startCompose(project) }
-func (c *stubClient) RestartCompose(project string) tea.Cmd { return c.restartCompose(project) }
+func (c *stubClient) StopCompose(project string) tea.Cmd {
+	if c.stopCompose != nil {
+		return c.stopCompose(project)
+	}
+	return noopCmd
+}
+func (c *stubClient) StartCompose(project string) tea.Cmd {
+	if c.startCompose != nil {
+		return c.startCompose(project)
+	}
+	return noopCmd
+}
+func (c *stubClient) RestartCompose(project string) tea.Cmd {
+	if c.restartCompose != nil {
+		return c.restartCompose(project)
+	}
+	return noopCmd
+}

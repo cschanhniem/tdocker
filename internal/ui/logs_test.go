@@ -27,7 +27,7 @@ func logsOpenWithLines(lines []string) App {
 }
 
 func TestLogs_FToggle_SwitchesToAllTail(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotTail string
 	mc.startLogs = func(_ context.Context, _ string, tail string, _ bool, _ string, _ int) tea.Cmd {
 		gotTail = tail
@@ -41,7 +41,7 @@ func TestLogs_FToggle_SwitchesToAllTail(t *testing.T) {
 }
 
 func TestLogs_FToggle_SwitchesBackToTail200(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotTail string
 	mc.startLogs = func(_ context.Context, _ string, tail string, _ bool, _ string, _ int) tea.Cmd {
 		gotTail = tail
@@ -56,7 +56,7 @@ func TestLogs_FToggle_SwitchesBackToTail200(t *testing.T) {
 }
 
 func TestLogs_FToggle_ClearsLines(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	m := logsOpen(mc, runningContainer)
 	m.logs.lines = []string{"line1", "line2", "line3"}
 	got := update(m, runeKey("f"))
@@ -66,7 +66,7 @@ func TestLogs_FToggle_ClearsLines(t *testing.T) {
 }
 
 func TestLogs_FToggle_IncrementsGen(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotGen int
 	mc.startLogs = func(_ context.Context, _ string, _ string, _ bool, _ string, gen int) tea.Cmd {
 		gotGen = gen
@@ -81,7 +81,7 @@ func TestLogs_FToggle_IncrementsGen(t *testing.T) {
 }
 
 func TestLogs_FToggle_PassesContainerID(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.startLogs = func(_ context.Context, id string, _ string, _ bool, _ string, _ int) tea.Cmd {
 		gotID = id

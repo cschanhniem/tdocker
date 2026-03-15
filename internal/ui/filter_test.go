@@ -15,7 +15,7 @@ var filterContainers = []docker.Container{
 }
 
 func modelWithSorted(containers []docker.Container) App {
-	m := newWithClient(newStubClient(), "")
+	m := newWithClient(&stubClient{}, "")
 	m.sorted = containers
 	m.containers = containers
 	m.fetch.loading = false

@@ -164,7 +164,7 @@ func TestFiltered_ExpandedContainerNotShownDuringFilter(t *testing.T) {
 }
 
 func TestRightArrow_ExpandsStandaloneContainer(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.inspectContainerExpand = func(id string) tea.Cmd {
 		gotID = id
@@ -185,7 +185,7 @@ func TestRightArrow_ExpandsStandaloneContainer(t *testing.T) {
 }
 
 func TestRightArrow_NoopOnAlreadyExpandedContainer(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	callCount := 0
 	mc.inspectContainerExpand = func(id string) tea.Cmd {
 		callCount++

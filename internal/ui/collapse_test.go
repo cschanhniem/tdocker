@@ -426,7 +426,7 @@ func TestComposeStart_OnCollapsedRowAllExited(t *testing.T) {
 }
 
 func TestComposeStop_ConfirmCallsClient(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotProject string
 	mc.stopCompose = func(project string) tea.Cmd {
 		gotProject = project

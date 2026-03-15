@@ -29,7 +29,7 @@ func nonLifecycleEvent(gen int) docker.EventLineMsg {
 }
 
 func TestInit_StartsBackgroundEventStream(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	startEventsCalled := false
 	mc.startEvents = func(_ context.Context, gen int) tea.Cmd {
 		if gen != 1 {
@@ -93,7 +93,7 @@ func TestEventLineMsg_NoDuplicateDebounce(t *testing.T) {
 	m.pendingRefresh = true
 
 	_, cmd := m.Update(lifecycleEvent("die", 1))
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		fetched = true
@@ -108,7 +108,7 @@ func TestEventLineMsg_NoDuplicateDebounce(t *testing.T) {
 }
 
 func TestAutoRefreshMsg_TriggersFetch(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		fetched = true
@@ -135,7 +135,7 @@ func TestAutoRefreshMsg_TriggersFetch(t *testing.T) {
 }
 
 func TestAutoRefreshMsg_SkipsWhenAlreadyLoading(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchContainers = func(_ bool) tea.Cmd {
 		fetched = true
@@ -185,7 +185,7 @@ func TestEventEndMsg_StaleGenIsIgnored(t *testing.T) {
 }
 
 func TestBgEventsRestartMsg_StartsNewStream(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var startedGen int
 	mc.startEvents = func(_ context.Context, gen int) tea.Cmd {
 		startedGen = gen
@@ -204,7 +204,7 @@ func TestBgEventsRestartMsg_StartsNewStream(t *testing.T) {
 }
 
 func TestBgEventsRestartMsg_StaleIsNoOp(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	called := false
 	mc.startEvents = func(_ context.Context, _ int) tea.Cmd {
 		called = true
@@ -223,7 +223,7 @@ func TestBgEventsRestartMsg_StaleIsNoOp(t *testing.T) {
 }
 
 func TestVKey_TogglesEventsPanelWithoutStartingStream(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	startCalled := false
 	mc.startEvents = func(_ context.Context, _ int) tea.Cmd {
 		startCalled = true

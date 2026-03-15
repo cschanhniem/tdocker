@@ -173,7 +173,7 @@ func TestUpdate_StatsMsgSchedulesNextTick(t *testing.T) {
 }
 
 func TestUpdate_StatsTickFetchesStats(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	var gotID string
 	mc.fetchStats = func(id string) tea.Cmd {
 		gotID = id
@@ -189,7 +189,7 @@ func TestUpdate_StatsTickFetchesStats(t *testing.T) {
 }
 
 func TestUpdate_StatsTickNoopWhenPanelClosed(t *testing.T) {
-	mc := newStubClient()
+	mc := &stubClient{}
 	fetched := false
 	mc.fetchStats = func(_ string) tea.Cmd {
 		fetched = true
