@@ -14,6 +14,8 @@ import (
 
 var ErrDaemonUnavailable = errors.New("docker daemon unavailable")
 
+const searchSep = "\x00"
+
 func isDaemonUnavailable(out []byte) bool {
 	s := string(out)
 	return strings.Contains(s, "Cannot connect to the Docker daemon") ||
@@ -57,15 +59,16 @@ const (
 )
 
 type Container struct {
-	ID         string `json:"ID"`
-	Names      string `json:"Names"`
-	Image      string `json:"Image"`
-	Command    string `json:"Command"`
-	State      string `json:"State"`
-	Status     string `json:"Status"`
-	RunningFor string `json:"RunningFor"`
-	Ports      string `json:"Ports"`
-	Labels     Labels `json:"Labels"`
+	ID          string `json:"ID"`
+	Names       string `json:"Names"`
+	Image       string `json:"Image"`
+	Command     string `json:"Command"`
+	State       string `json:"State"`
+	Status      string `json:"Status"`
+	RunningFor  string `json:"RunningFor"`
+	Ports       string `json:"Ports"`
+	Labels      Labels `json:"Labels"`
+	SearchIndex string `json:"-"`
 }
 
 func (c Container) ComposeProject() string {
@@ -214,5 +217,13 @@ func Sort(containers []Container) []Container {
 		}
 		return strings.Compare(a.Names, b.Names)
 	})
+	BuildSearchIndex(sorted)
 	return sorted
+}
+
+func BuildSearchIndex(containers []Container) {
+	for i := range containers {
+		c := &containers[i]
+		c.SearchIndex = strings.ToLower(c.Names + searchSep + c.Image + searchSep + c.ID + searchSep + c.ComposeProject() + searchSep + c.ComposeService())
+	}
 }
